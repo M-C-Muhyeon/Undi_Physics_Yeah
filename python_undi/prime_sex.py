@@ -1,11 +1,13 @@
+# Rebuilding the full pipeline including visualization
 
 import numpy as np
 from sympy import nextprime, isprime
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from PIL import Image
+import matplotlib.pyplot as plt
 
-PRIME_DIGIT=200
+PRIME_DIGIT = 35
 
 # 1. Generate n-digit primes
 def generate_n_digit_primes(n, count):
@@ -65,9 +67,22 @@ def generate_image_dataset(primes, non_primes, size=(32, 32)):
 
     return np.array(X_img), np.array(y_img)
 
-# 6. Main routine
+# 6. Visualization
+def show_sample_images(X, y, count=5, image_size=(32, 32)):
+    indices = np.random.choice(len(X), size=count, replace=False)
+    fig, axs = plt.subplots(1, count, figsize=(count * 2, 2))
+    for i, idx in enumerate(indices):
+        image = X[idx].reshape(image_size)
+        label = "Prime" if y[idx] == 1 else "Non-prime"
+        axs[i].imshow(image, cmap='gray', interpolation='nearest')
+        axs[i].axis('off')
+        axs[i].set_title(label)
+    plt.tight_layout()
+    plt.show()
+
+# 7. Main routine
 if __name__ == "__main__":
-    digits = PRIME_DIGIT  # for testing; change to 100 for full version
+    digits = PRIME_DIGIT
     prime_count = 200
     non_prime_count = 200
 
@@ -77,7 +92,7 @@ if __name__ == "__main__":
 
     print("이미지 변환 중...")
     X, y = generate_image_dataset(primes, non_primes, size=(32, 32))
-    X = X.astype("float32") / 255.0  # normalize
+    X = X.astype("float32") / 255.0
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -87,3 +102,6 @@ if __name__ == "__main__":
 
     acc = model.score(X_test, y_test)
     print(f"최종 정확도: {acc:.4f}")
+
+    # Show random sample images
+    show_sample_images(X, y, count=5, image_size=(32, 32))
