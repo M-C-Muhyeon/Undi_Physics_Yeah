@@ -160,31 +160,5 @@ Write-Host "`n>>> Removing unused UWP apps..." -ForegroundColor Red
 Get-AppxPackage | Where-Object {$_.Name -match "People|Zune|Bing|XBox"} | Remove-AppxPackage -ErrorAction SilentlyContinue
 Write-Host "✅ Unused UWP apps removed" -ForegroundColor Green
 
-
-#21. Limit kernel memory pool usage more aggressively
-
-Write-Host "`n>>> Enforcing stricter kernel memory pool limits..." -ForegroundColor Red
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v PoolUsageMaximum /t REG_DWORD /d 20 /f | Out-Null
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v PagedPoolSize /t REG_DWORD /d 0xffffffff /f | Out-Null
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v LargeSystemCache /t REG_DWORD /d 0 /f | Out-Null
-Write-Host "✅ Kernel memory limits updated" -ForegroundColor Green
-
-#22. Disable WDDM GPU scheduling priority
-
-Write-Host "`n>>> Disabling WDDM GPU scheduling & multimedia prioritization..." -ForegroundColor Red
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v SystemResponsiveness /t REG_DWORD /d 0 /f | Out-Null
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v GPU Priority /t REG_DWORD /d 1 /f | Out-Null
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v Priority /t REG_DWORD /d 1 /f | Out-Null
-Write-Host "✅ WDDM GPU scheduling deprioritized" -ForegroundColor Green
-
-#23. bcdedit for memory boundary adjustments
-
-Write-Host "`n>>> Applying bcdedit parameters to restrict hardware-reserved memory (requires reboot)..." -ForegroundColor Red
-bcdedit /set useplatformclock true
-bcdedit /set nolowmem yes
-bcdedit /set truncatememory 0x3FFFFFFF
-Write-Host "✅ bcdedit parameters applied — please reboot to take full effect" -ForegroundColor Yellow
-
-
 # Final message
 Write-Host "`n🔥 ULTRA HARDCORE MODE ENABLED — Microsoft neutered, Windows unleashed 🔥" -ForegroundColor Cyan
