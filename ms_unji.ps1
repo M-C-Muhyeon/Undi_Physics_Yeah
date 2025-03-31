@@ -100,5 +100,44 @@ Write-Host "`n>>> Disabling scheduled defrag (for SSDs)..." -ForegroundColor Red
 Disable-ScheduledTask -TaskName "\Microsoft\Windows\Defrag\ScheduledDefrag" | Out-Null
 Write-Host "✅ Scheduled defrag disabled" -ForegroundColor Green
 
+# 13. Clean up temp files and empty recycle bin
+Write-Host "`n>>> Cleaning up temp files and recycle bin..." -ForegroundColor Red
+Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:LOCALAPPDATA\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
+Clear-RecycleBin -Force -ErrorAction SilentlyContinue
+Write-Host "✅ Temporary files and recycle bin cleaned" -ForegroundColor Green
+
+# 14. Release memory manually via working set trim (RAMMap alternative)
+Write-Host "`n>>> Attempting manual memory release using working set trim..." -ForegroundColor Red
+Get-Process | ForEach-Object {
+    try {
+        $_.MinWorkingSet = 64MB
+        $_.MaxWorkingSet = 128MB
+    } catch {}
+}
+Write-Host "✅ Attempted working set trim (partial standby memory release)" -ForegroundColor Green
+
+# 15. Enforce high performance while on battery (powercfg boost)
+Write-Host "`n>>> Enforcing high performance on battery mode..." -ForegroundColor Red
+powercfg /setactive SCHEME_MIN
+powercfg -change standby-timeout-ac 0
+powercfg -change standby-timeout-dc 0
+powercfg -change monitor-timeout-dc 0
+powercfg -change monitor-timeout-ac 0
+powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PROCTHROTTLEMIN 100
+powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PROCTHROTTLEMAX 100
+powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFINCTHRESHOLD 100
+powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFINCPOLICY 100
+powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFDECPOLICY 100
+powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFBOOSTMODE 2
+Write-Host "✅ Processor boost and throttle settings forced to max" -ForegroundColor Green
+
+# 16. Disable Windows power throttling via registry
+Write-Host "`n>>> Disabling Windows power throttling registry flag..." -ForegroundColor Red
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v EnergyEstimationDisabled /t REG_DWORD /d 1 /f | Out-Null
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v PowerThrottlingOff /t REG_DWORD /d 1 /f | Out-Null
+Write-Host "✅ Power throttling registry keys set" -ForegroundColor Green
+
 # Final message
 Write-Host "`n🔥 ULTRA HARDCORE MODE ENABLED — Microsoft neutered, Windows unleashed 🔥" -ForegroundColor Cyan
+
