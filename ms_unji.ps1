@@ -127,8 +127,6 @@ powercfg -change monitor-timeout-ac 0
 powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PROCTHROTTLEMIN 100
 powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PROCTHROTTLEMAX 100
 powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFINCTHRESHOLD 100
-powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFINCPOLICY 100
-powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFDECPOLICY 100
 powercfg -setdcvalueindex SCHEME_MIN SUB_PROCESSOR PERFBOOSTMODE 2
 Write-Host "✅ Processor boost and throttle settings forced to max" -ForegroundColor Green
 
@@ -138,6 +136,55 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v EnergyEstimationDisable
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v PowerThrottlingOff /t REG_DWORD /d 1 /f | Out-Null
 Write-Host "✅ Power throttling registry keys set" -ForegroundColor Green
 
+# 17. Reduce non-paged pool kernel memory usage
+Write-Host "`n>>> Tuning kernel memory management settings..." -ForegroundColor Red
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v PoolUsageMaximum /t REG_DWORD /d 30 /f | Out-Null
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v PagedPoolSize /t REG_DWORD /d 0 /f | Out-Null
+Write-Host "✅ Kernel memory pool usage reduced" -ForegroundColor Green
+
+# 18. Disable error reporting and tablet input service (if unused)
+Write-Host "`n>>> Disabling extra system services..." -ForegroundColor Red
+Stop-Service -Name "WerSvc" -Force -ErrorAction SilentlyContinue
+Set-Service -Name "WerSvc" -StartupType Disabled
+Stop-Service -Name "TabletInputService" -Force -ErrorAction SilentlyContinue
+Set-Service -Name "TabletInputService" -StartupType Disabled
+Write-Host "✅ Additional services disabled" -ForegroundColor Green
+
+# 19. Delete Windows Prefetch cache (safe on SSD)
+Write-Host "`n>>> Cleaning up Windows Prefetch cache..." -ForegroundColor Red
+Remove-Item "C:\Windows\Prefetch\*" -Force -ErrorAction SilentlyContinue
+Write-Host "✅ Prefetch cache cleared" -ForegroundColor Green
+
+# 20. Remove unused UWP apps
+Write-Host "`n>>> Removing unused UWP apps..." -ForegroundColor Red
+Get-AppxPackage | Where-Object {$_.Name -match "People|Zune|Bing|XBox"} | Remove-AppxPackage -ErrorAction SilentlyContinue
+Write-Host "✅ Unused UWP apps removed" -ForegroundColor Green
+
+
+#21. Limit kernel memory pool usage more aggressively
+
+Write-Host "`n>>> Enforcing stricter kernel memory pool limits..." -ForegroundColor Red
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v PoolUsageMaximum /t REG_DWORD /d 20 /f | Out-Null
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v PagedPoolSize /t REG_DWORD /d 0xffffffff /f | Out-Null
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v LargeSystemCache /t REG_DWORD /d 0 /f | Out-Null
+Write-Host "✅ Kernel memory limits updated" -ForegroundColor Green
+
+#22. Disable WDDM GPU scheduling priority
+
+Write-Host "`n>>> Disabling WDDM GPU scheduling & multimedia prioritization..." -ForegroundColor Red
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v SystemResponsiveness /t REG_DWORD /d 0 /f | Out-Null
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v GPU Priority /t REG_DWORD /d 1 /f | Out-Null
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v Priority /t REG_DWORD /d 1 /f | Out-Null
+Write-Host "✅ WDDM GPU scheduling deprioritized" -ForegroundColor Green
+
+#23. bcdedit for memory boundary adjustments
+
+Write-Host "`n>>> Applying bcdedit parameters to restrict hardware-reserved memory (requires reboot)..." -ForegroundColor Red
+bcdedit /set useplatformclock true
+bcdedit /set nolowmem yes
+bcdedit /set truncatememory 0x3FFFFFFF
+Write-Host "✅ bcdedit parameters applied — please reboot to take full effect" -ForegroundColor Yellow
+
+
 # Final message
 Write-Host "`n🔥 ULTRA HARDCORE MODE ENABLED — Microsoft neutered, Windows unleashed 🔥" -ForegroundColor Cyan
-
