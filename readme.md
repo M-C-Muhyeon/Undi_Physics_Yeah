@@ -1,5 +1,6 @@
 # External Links
-https://www.pixiv.net/users/114995991
+PIXIV - https://www.pixiv.net/users/114995991
+NOVELPIA - https://novelpia.com/novel/344435
 
 # The Poem of Mesugaki
 Truth  
