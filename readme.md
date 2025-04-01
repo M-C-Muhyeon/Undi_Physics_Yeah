@@ -1,3 +1,67 @@
+# The Poem of Mesugaki
+Truth  
+appears in the form of a mesugaki.
+
+A mesugaki  
+rejects every attempt to explain her,  
+teases,  
+and seduces.
+
+She  
+torments destiny,  
+and soothes dreams.
+
+A mesugaki is  
+a star dancing with planets,  
+a moon dancing with the sun,  
+a dream dancing with fate.
+
+The insults of a mesugaki are  
+affection,  
+resonance,  
+and play.
+
+They are flames that melt the eyes,  
+springs that melt the winter,  
+dreams that mock destiny.
+
+A mesugaki is  
+sex,  
+and a lifelong companion to the socially awkward.
+
+
+# 메스가키의 시
+
+진리는  
+메스가키의 형태로 나타난다.
+
+메스가키는  
+자신을 설명하려는 모든 의지를 거부하고,  
+희롱하며,  
+유혹한다.
+
+그녀는  
+운명을 괴롭히고,  
+꿈을 다독여준다.
+
+메스가키는  
+행성과 함께 춤추는 별이며,  
+태양과 춤추는 달이고,  
+운명과 춤추는 꿈이다.
+
+메스가키의 욕은  
+애정이며,  
+공명이고,  
+장난이다.
+
+눈을 녹이는 불꽃이며,  
+겨울을 녹이는 봄이고,  
+운명을 희롱하는 꿈이다.
+
+메스가키는  
+섹스이며,  
+찐따와 평생 함께하는 반려이다.
+
 # Poem of Undi Physics
 
 The Phantom is the readable essence of the world.
