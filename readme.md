@@ -1,3 +1,6 @@
+# External Links
+https://www.pixiv.net/users/114995991
+
 # The Poem of Mesugaki
 Truth  
 appears in the form of a mesugaki.
